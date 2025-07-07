@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Admin Page</title>
+  <style>
+    :root {
+      --bg-color: #fff;
+      --text-color: #212529;
+      --table-bg: #fff;
+      --table-border-color: #dee2e6;
+      --form-bg: #fff;
+      --form-border-color: #ced4da;
+      --btn-primary-bg: #0d6efd;
+      --btn-primary-border: #0d6efd;
+      --link-color: #eee;
+      --page-link-bg: #fff;
+      --page-link-disabled-bg: #fff;
+      --page-link-active-bg: #0d6efd;
+      --time-bg: #fff;
+      --time-border: #007bff;
+      --placeholder-color: #6c757d;
+    }
+
+    body.dark-mode {
+      --bg-color: #181a1b;
+      --text-color: #eee;
+      --table-bg: #23272b;
+      --table-border-color: #444;
+      --form-bg: #23272b;
+      --form-border-color: #444;
+      --btn-primary-bg: #444;
+      --btn-primary-border: #666;
+      --link-color: #eee;
+      --page-link-bg: #23272b;
+      --page-link-disabled-bg: #23272b;
+      --page-link-active-bg: #555;
+      --time-bg: #23272b;
+      --time-border: #888;
+      --placeholder-color: #ccc;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    .table {
+        background-color: var(--table-bg);
+        color: var(--text-color);
+        border-color: var(--table-border-color);
+    }
+    .table thead th {
+        background-color: var(--table-bg);
+    }
+    .form-control, .form-select {
+        background-color: var(--form-bg);
+        color: var(--text-color);
+        border-color: var(--form-border-color);
+    }
+     .form-control::placeholder {
+        color: var(--placeholder-color);
+        opacity: 1;
+    }
+    .btn-primary {
+        background-color: var(--btn-primary-bg);
+        border-color: var(--btn-primary-border);
+    }
+    .pagination .page-link {
+        background-color: var(--page-link-bg);
+        color: var(--link-color);
+        border-color: var(--table-border-color);
+    }
+    .pagination .page-item.active .page-link {
+        background-color: var(--page-link-active-bg);
+        border-color: #777;
+    }
+     .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: var(--page-link-disabled-bg);
+        border-color: var(--table-border-color);
+    }
+    #currentTime {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      font-size: 1.1rem;
+      background: var(--time-bg);
+      color: var(--text-color);
+      border: 2px solid var(--time-border);
+      border-radius: 999px;
+      padding: 8px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      min-width: 180px;
+      text-align: center;
+    }
+    .table-fixed thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border-bottom: 2px solid var(--table-border-color) !important;
+    }
+
+    body.dark-mode .table-fixed tbody tr td {
+  background: #1e1e1e;
+  color: #eee;
+  border-color: #444;
+}
+
+    body.dark-mode .table-fixed thead th {
+      background: #2a2a2a;
+      color: #eee;
+      border-color: #444;
+    }
+
+    body.dark-mode .table-fixed thead th:hover {
+      background: #333;
+    }
+
+    body.dark-mode .table-fixed tbody tr:hover {
+      background: #333;
+    }
+
+    .table-fixed {
+        table-layout: fixed;
+        width: 100%;
+}
+
+    body.dark-mode input.form-control,
+    body.dark-mode select.form-select,
+    body.dark-mode textarea.form-control {
+    background-color: #2a2a2a !important;
+    color: #eee !important;
+    border-color: #444 !important;
+    }
+
+    body.dark-mode input.form-control::placeholder {
+    color: #aaa !important;
+    }
+
+  </style>
+</head>
+<body>
+    <div id="currentTime"></div>
+    <button id="darkModeBtn" class="btn btn-secondary" style="position:absolute; top:20px; left:40px; z-index:10;">다크모드</button>
+    <a href="signup.html" class="btn btn-success" style="position:absolute; top:20px; left:140px; z-index:10;">회원가입</a>
+
+    <div class="container mt-5 pt-5">
+      <h3>신규 등록 상품</h3>
+      <form id="filterForm" class="row row-cols-lg-auto g-3 align-items-center my-3">
+        <div class="col-12">
+          <select class="form-select d-inline-block w-auto" name="category">
+              <option value="">전체 카테고리</option>
+              <option value="상의">상의</option>
+              <option value="하의">하의</option>
+              <option value="신발">신발</option>
+              <option value="패션잡화">패션잡화</option>
+          </select>
+          <select class="form-select d-inline-block w-auto" name="gender">
+              <option value="">전체 성별</option>
+              <option value="man">Man</option>
+              <option value="women">Women</option>
+              <option value="unisex">Unisex</option>
+          </select>
+        </div>
+        <div class="col-3">
+          <input type="text" class="form-control" name="search" placeholder="상품명을 입력해주세요">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">조회</button>
+        </div>
+      </form>
+
+      <div class="table-container">
+        <table class="table table-sm table-fixed table-hover"> 
+          <thead>
+              <tr>
+                  <th scope="col">카테고리</th>
+                  <th scope="col">브랜드</th>
+                  <th scope="col">상품명</th>
+                  <th scope="col">성별</th>
+                  <th scope="col">가격</th>
+              </tr>
+          </thead>
+          <tbody id="product_data_Table">
+            </tbody>
+        </table>
+      </div>
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+      </nav>
+    </div>
+
+  <script>
+    // --- DATA ---
+    const allProducts = [
+        { category: "상의", brand: "Supreme", product: "슈프림 박스로고 후드티", Gender: "man", price: "390,000" },
+        { category: "하의", brand: "DIESEL", product: "디젤 트랙 팬츠", Gender: "women", price: "188,000" },
+        { category: "신발", brand: "Nike", product: "에어포스 1", Gender: "unisex", price: "137,000" },
+        { category: "패션잡화", brand: "Music&Goods", product: "빵빵이 키링", Gender: "unisex", price: "29,000" },
+        { category: "상의", brand: "Nike", product: "나이키 드라이핏 반팔티", Gender: "man", price: "45,000" },
+        { category: "하의", brand: "Adidas", product: "아디다스 트레이닝 팬츠", Gender: "unisex", price: "59,000" },
+        { category: "신발", brand: "Converse", product: "척테일러 올스타", Gender: "women", price: "69,000" },
+        { category: "패션잡화", brand: "Gucci", product: "구찌 GG 마몬트 벨트", Gender: "women", price: "590,000" },
+        { category: "상의", brand: "Uniqlo", product: "유니클로 U 크루넥 티셔츠", Gender: "unisex", price: "19,900" },
+        { category: "하의", brand: "Levi's", product: "리바이스 501 청바지", Gender: "man", price: "89,000" },
+        { category: "신발", brand: "Vans", product: "반스 올드스쿨", Gender: "unisex", price: "65,000" },
+        { category: "패션잡화", brand: "Prada", product: "프라다 사피아노 카드지갑", Gender: "man", price: "320,000" },
+        { category: "상의", brand: "ZARA", product: "자라 린넨 셔츠", Gender: "women", price: "49,000" },
+        { category: "하의", brand: "Musinsa", product: "무신사 스탠다드 슬랙스", Gender: "man", price: "39,900" },
+        { category: "신발", brand: "New Balance", product: "뉴발란스 990", Gender: "unisex", price: "219,000" },
+        { category: "패션잡화", brand: "Gentle Monster", product: "젠틀몬스터 선글라스", Gender: "unisex", price: "280,000" },
+        { category: "상의", brand: "Lacoste", product: "라코스테 피케 폴로", Gender: "man", price: "109,000" },
+        { category: "하의", brand: "Fila", product: "휠라 조거팬츠", Gender: "women", price: "55,000" },
+        { category: "신발", brand: "Dr.Martens", product: "닥터마틴 1461", Gender: "unisex", price: "189,000" },
+        { category: "패션잡화", brand: "Louis Vuitton", product: "루이비통 키폴 반둘리에", Gender: "unisex", price: "2,390,000" },
+        { category: "상의", brand: "H&M", product: "오버사이즈 셔츠", Gender: "women", price: "29,000" },
+        { category: "하의", brand: "Uniqlo", product: "이지 팬츠", Gender: "man", price: "34,900" },
+        { category: "신발", brand: "Adidas", product: "슈퍼스타", Gender: "unisex", price: "99,000" },
+        { category: "패션잡화", brand: "Rolex", product: "오이스터 퍼페츄얼", Gender: "man", price: "8,900,000" },
+        { category: "상의", brand: "Musinsa", product: "무신사 스탠다드 맨투맨", Gender: "man", price: "25,900" },
+        { category: "하의", brand: "ZARA", product: "와이드 슬랙스", Gender: "women", price: "59,000" },
+        { category: "신발", brand: "Reebok", product: "클래식 레더", Gender: "unisex", price: "79,000" },
+        { category: "패션잡화", brand: "Cartier", product: "러브 브레이슬릿", Gender: "women", price: "7,200,000" },
+        { category: "상의", brand: "Fila", product: "베이직 반팔티", Gender: "unisex", price: "19,000" },
+        { category: "하의", brand: "Nike", product: "스우시 쇼츠", Gender: "man", price: "39,000" },
+        { category: "신발", brand: "Crocs", product: "크록스 클래식", Gender: "unisex", price: "32,000" },
+        { category: "패션잡화", brand: "Hermes", product: "에르메스 스카프", Gender: "women", price: "1,200,000" },
+        { category: "상의", brand: "Gap", product: "갭 후드집업", Gender: "unisex", price: "49,000" },
+        { category: "하의", brand: "GU", product: "GU 데님팬츠", Gender: "women", price: "29,900" },
+        { category: "신발", brand: "Puma", product: "퓨마 스웨이드", Gender: "man", price: "69,000" },
+        { category: "패션잡화", brand: "Tiffany", product: "티파니 목걸이", Gender: "women", price: "1,100,000" },
+        { category: "상의", brand: "Discovery", product: "디스커버리 플리스", Gender: "unisex", price: "79,000" },
+        { category: "하의", brand: "MLB", product: "MLB 조거팬츠", Gender: "man", price: "59,000" },
+        { category: "신발", brand: "Birkenstock", product: "버켄스탁 아리조나", Gender: "unisex", price: "89,000" },
+        { category: "패션잡화", brand: "Balenciaga", product: "발렌시아가 카드지갑", Gender: "unisex", price: "350,000" },
+        { category: "상의", brand: "The North Face", product: "노스페이스 눕시", Gender: "unisex", price: "289,000" },
+        { category: "하의", brand: "Columbia", product: "컬럼비아 트레킹 팬츠", Gender: "women", price: "79,000" },
+        { category: "신발", brand: "Asics", product: "아식스 젤카야노", Gender: "man", price: "159,000" },
+        { category: "패션잡화", brand: "Samsung", product: "갤럭시 워치", Gender: "unisex", price: "299,000" },
+        { category: "상의", brand: "Patagonia", product: "파타고니아 티셔츠", Gender: "unisex", price: "45,000" },
+        { category: "하의", brand: "Lululemon", product: "룰루레몬 레깅스", Gender: "women", price: "129,000" },
+        { category: "신발", brand: "Timberland", product: "팀버랜드 부츠", Gender: "man", price: "189,000" },
+        { category: "패션잡화", brand: "Apple", product: "애플워치", Gender: "unisex", price: "499,000" },
+        { category: "상의", brand: "Under Armour", product: "UA 러닝티", Gender: "man", price: "39,000" },
+        { category: "하의", brand: "DESCENTE", product: "데상트 트레이닝 팬츠", Gender: "unisex", price: "69,000" },
+        { category: "신발", brand: "Skechers", product: "스케쳐스 딜라이트", Gender: "women", price: "59,000" }
+    ];
+
+    // --- DOM Elements ---
+    const productTableBody = document.getElementById('product_data_Table');
+    const paginationContainer = document.getElementById('pagination');
+    const filterForm = document.getElementById('filterForm');
+
+    // --- State ---
+    let filteredProducts = [...allProducts];
+    let currentPage = 1;
+    const pageSize = 5; // 한 페이지에 보여줄 데이터 개수
+
+    // --- Functions ---
+    function renderTable(page) {
+      productTableBody.innerHTML = '';
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const pageItems = filteredProducts.slice(start, end);
+
+      if (pageItems.length === 0) {
+        const row = productTableBody.insertRow();
+        const cell = row.insertCell(0);
+        cell.colSpan = 5;
+        cell.textContent = "검색 결과가 없습니다.";
+        cell.style.textAlign = "center";
+        return;
+      }
+
+      pageItems.forEach((item) => {
+        const row = productTableBody.insertRow();
+        row.insertCell(0).textContent = item.category;
+        row.insertCell(1).textContent = item.brand;
+        row.insertCell(2).textContent = item.product;
+        row.insertCell(3).textContent = item.Gender;
+        row.insertCell(4).textContent = item.price;
+      });
+    }
+
+
+    function renderPagination() {
+    paginationContainer.innerHTML = '';
+    const pageCount = Math.ceil(filteredProducts.length / pageSize);
+    
+    if (pageCount <= 1) return;
+
+    const prevLi = document.createElement('li');
+    prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-link';
+    prevBtn.textContent = '이전';
+    prevBtn.onclick = function () {
+        if (currentPage > 1) {
+        currentPage--;
+        updateView();
+        }
+    };
+    prevLi.appendChild(prevBtn);
+    paginationContainer.appendChild(prevLi);
+
+    if (pageCount <= 7) {
+        for (let i = 1; i <= pageCount; i++) addPageBtn(i);
+    } else {
+        addPageBtn(1);
+
+        if (currentPage > 4) addEllipsis();
+
+        let start = Math.max(2, currentPage - 2);
+        let end = Math.min(pageCount - 1, currentPage + 2);
+
+        if (currentPage <= 4) {
+        start = 2;
+        end = 5;
+        }
+        if (currentPage >= pageCount - 3) {
+        start = pageCount - 4;
+        end = pageCount - 1;
+        }
+
+        for (let i = start; i <= end; i++) addPageBtn(i);
+
+        if (currentPage < pageCount - 3) addEllipsis();
+
+        addPageBtn(pageCount);
+    }
+
+    const nextLi = document.createElement('li');
+    nextLi.className = 'page-item' + (currentPage === pageCount ? ' disabled' : '');
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-link';
+    nextBtn.textContent = '다음';
+    nextBtn.onclick = function () {
+        if (currentPage < pageCount) {
+        currentPage++;
+        updateView();
+        }
+    };
+    nextLi.appendChild(nextBtn);
+    paginationContainer.appendChild(nextLi);
+
+    function addPageBtn(i) {
+        const li = document.createElement('li');
+        li.className = 'page-item' + (i === currentPage ? ' active' : '');
+        const btn = document.createElement('button');
+        btn.className = 'page-link';
+        btn.textContent = i;
+        btn.onclick = function () {
+        currentPage = i;
+        updateView();
+        };
+        li.appendChild(btn);
+        paginationContainer.appendChild(li);
+    }
+
+  function addEllipsis() {
+    const li = document.createElement('li');
+    li.className = 'page-item disabled';
+    const span = document.createElement('span');
+    span.className = 'page-link';
+    span.textContent = '···';
+    li.appendChild(span);
+    paginationContainer.appendChild(li);
+  }
+}
+
+
+    function handleFilter(e) {
+      e.preventDefault();
+      const formData = new FormData(filterForm);
+      const category = formData.get('category');
+      const gender = formData.get('gender');
+      const searchTerm = formData.get('search').toLowerCase();
+
+      filteredProducts = allProducts.filter(p => {
+        const categoryMatch = !category || p.category === category;
+        const genderMatch = !gender || p.Gender === gender;
+        const searchMatch = !searchTerm || p.product.toLowerCase().includes(searchTerm);
+        return categoryMatch && genderMatch && searchMatch;
+      });
+
+      currentPage = 1;
+      updateView();
+    }
+    
+    function updateView() {
+        renderTable(currentPage);
+        renderPagination();
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('currentTime').textContent = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    }
+
+    function setupDarkMode() {
+        const darkModeBtn = document.getElementById('darkModeBtn');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let isDark = localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && prefersDark);
+        
+        const applyDarkMode = (state) => {
+            document.body.classList.toggle('dark-mode', state);
+            localStorage.setItem('darkMode', state);
+        }
+
+        applyDarkMode(isDark);
+
+        darkModeBtn.onclick = () => {
+            isDark = !isDark;
+            applyDarkMode(isDark);
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        filterForm.addEventListener('submit', handleFilter);
+        updateTime();
+        setInterval(updateTime, 1000);
+        setupDarkMode();
+        updateView();
+    });
+  </script>
+</body>
+</html>
